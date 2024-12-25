@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Election Prediction System Ghana</h1>
-    <form method="post" id="predictionForm">
+    <form id="predictionForm">
         <label for="Year">Year:</label>
         <input type="number" id="Year" name="Year" required><br><br>
 
@@ -24,7 +24,6 @@
             <option value="Upper West">Upper West</option>
             <option value="Volta">Volta</option>
             <option value="Brong Ahafo">Brong Ahafo</option>
-            
         </select><br><br>
 
         <label for="Incumbent Party">Incumbent Party:</label>
@@ -45,6 +44,53 @@
 
         <button type="submit">Predict</button>
     </form>
+
+    <div id="result" class="prediction-result"></div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Collecting data from the form
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => { data[key] = value; });
+
+            try {
+                // Sending the data to the Flask backend for classification prediction
+                const classificationResponse = await fetch('/predict/classification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const classificationResult = await classificationResponse.json();
+
+                // Sending the data to the Flask backend for regression prediction
+                const regressionResponse = await fetch('/predict/regression', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const regressionResult = await regressionResponse.json();
+
+                // Displaying the predictions
+                document.getElementById('result').innerHTML = `
+                    <h3>Predictions:</h3>
+                    <p><strong>Classification Prediction:</strong> ${classificationResult.prediction || classificationResult.error}</p>
+                    <p><strong>Regression Prediction:</strong> ${regressionResult.predictions || regressionResult.error}</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+            }
+        });
+    </script>
+
     <script src="../static/script.js"></script>
 </body>
 </html>
