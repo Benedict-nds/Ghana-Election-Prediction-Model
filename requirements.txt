@@ -8,6 +8,7 @@ et_xmlfile==2.0.0
 Flask==3.1.0
 Flask-Cors==5.0.0
 fonttools==4.55.3
+gunicorn==23.0.0
 holidays==0.63
 importlib_resources==6.4.5
 itsdangerous==2.2.0
